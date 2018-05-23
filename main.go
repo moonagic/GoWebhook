@@ -1,16 +1,16 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"fmt"
 	"crypto/sha1"
 	"crypto/hmac"
 	"encoding/hex"
 	"io/ioutil"
-	"encoding/json"
 	"os/exec"
+	"encoding/json"
 	"os"
+	"log"
 )
 
 var TARGETSECRET string = ""
@@ -20,7 +20,7 @@ var TARGETHOST string = ""
 var TARGETSHELL string = ""
 
 
-func ComputeHmac1(message string) string {
+func generateHashSignature(message string) string {
 	h := hmac.New(sha1.New, []byte(TARGETSECRET))
 	h.Write([]byte(message))
 	return "sha1=" + hex.EncodeToString(h.Sum(nil))
@@ -30,7 +30,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "{\"code\":200, \"description\":\"service running...\"}")
 }
 
-func aotoBuild(w http.ResponseWriter, r *http.Request)  {
+func autoBuild(w http.ResponseWriter, r *http.Request)  {
 	if r.Method == "post" || r.Method == "POST" {
 		fmt.Println(r.URL.RequestURI())
 		if r.URL.RequestURI() == TARGETURL {
@@ -39,19 +39,10 @@ func aotoBuild(w http.ResponseWriter, r *http.Request)  {
 				r.Body.Close()
 
 				signature := r.Header.Get("X-Hub-Signature")
-				if signature == ComputeHmac1(string(result)) {
+				if signature == generateHashSignature(string(result)) {
 					fmt.Fprintln(w, "{\"code\":200, \"description\":\"OK\"}")
-					fmt.Println("验证通过")
-					go func() {
-						cmd := exec.Command("/bin/sh", TARGETSHELL)
-						bytes, err := cmd.Output()
-						if err == nil {
-							fmt.Println(string(bytes))
-						} else {
-							fmt.Println("err", err)
-						}
-					}()
-
+					fmt.Println("验证通过,启动部署任务")
+					go startTask()
 				} else {
 					fmt.Println("验证失败")
 					fmt.Fprintln(w, "{\"code\":200, \"error\":\"Signature error\"}")
@@ -67,9 +58,8 @@ func aotoBuild(w http.ResponseWriter, r *http.Request)  {
 	}
 }
 
-func main() {
-	// config
-	result, err := ioutil.ReadFile("/etc/webhook/config")
+func loadConfig()  {
+	result, err := ioutil.ReadFile("/etc/gowebhook/config")
 	if err == nil {
 		var f interface{}
 		json.Unmarshal(result, &f)
@@ -86,22 +76,37 @@ func main() {
 			TARGETPORT = localPort
 			TARGETSHELL = localShell
 		} else {
-			fmt.Println("Broken config .")
+			fmt.Println("Broken config.")
 			os.Exit(0)
 		}
 	} else {
-		fmt.Println("Can not find config file.../etc/webhook/config")
+		fmt.Println("Can not find config file...in \"/etc/gowebhook/config\"")
 		os.Exit(0)
 	}
-	
-	// router
-	http.HandleFunc("/", index)
-	http.HandleFunc("/auto_build", aotoBuild)
+}
 
+func startService()  {
+	http.HandleFunc("/", index)
+	http.HandleFunc("/auto_build", autoBuild)
 
 	fmt.Println("service starting...", TARGETHOST, TARGETPORT)
 	listenErr := http.ListenAndServe(fmt.Sprintf("%s:%s", TARGETHOST, TARGETPORT), nil)
 	if listenErr != nil {
 		log.Fatal("ListenAndServe: ", listenErr)
 	}
+}
+
+func startTask()  {
+	cmd := exec.Command("/bin/sh", TARGETSHELL)
+	bytes, err := cmd.Output()
+	if err == nil {
+		fmt.Println(string(bytes))
+	} else {
+		fmt.Println("err", err)
+	}
+}
+
+func main() {
+	loadConfig()
+	startService()
 }
