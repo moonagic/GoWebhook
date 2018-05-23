@@ -31,30 +31,26 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func autoBuild(w http.ResponseWriter, r *http.Request)  {
-	if r.Method == "post" || r.Method == "POST" {
+	if (r.Method == "post" || r.Method == "POST") && r.URL.RequestURI() == TARGETURL {
 		fmt.Println(r.URL.RequestURI())
-		if r.URL.RequestURI() == TARGETURL {
-			if r.Header.Get("x-github-event") == "push" {
-				result, _ := ioutil.ReadAll(r.Body)
-				r.Body.Close()
+		if r.Header.Get("x-github-event") == "push" {
+			bodyContent, _ := ioutil.ReadAll(r.Body)
+			r.Body.Close()
 
-				signature := r.Header.Get("X-Hub-Signature")
-				if signature == generateHashSignature(string(result)) {
-					fmt.Fprintln(w, "{\"code\":200, \"description\":\"OK\"}")
-					fmt.Println("验证通过,启动部署任务")
-					go startTask()
-				} else {
-					fmt.Println("验证失败")
-					fmt.Fprintln(w, "{\"code\":200, \"error\":\"Signature error\"}")
-				}
+			signature := r.Header.Get("X-Hub-Signature")
+			if verifySignature(signature, string(bodyContent)) {
+				fmt.Fprintln(w, "{\"code\":200, \"description\":\"OK\"}")
+				fmt.Println("验证通过,启动部署任务")
+				go startTask()
 			} else {
-				fmt.Fprintln(w, "{\"code\":200, \"error\":\"Unmatch x-github-event\"}")
+				fmt.Println("验证失败")
+				fmt.Fprintln(w, "{\"code\":200, \"error\":\"Signature error\"}")
 			}
 		} else {
-			fmt.Fprintln(w, "{\"code\":200, \"error\":\"Unknow request url\"}")
+			fmt.Fprintln(w, "{\"code\":200, \"error\":\"Unmatch x-github-event\"}")
 		}
 	} else {
-		fmt.Fprintln(w, "{\"code\":200, \"error\":\"Error Method\"}")
+		fmt.Fprintln(w, "{\"code\":200, \"error\":\"Error Method or unknow request url\"}")
 	}
 }
 
@@ -98,12 +94,16 @@ func startService()  {
 
 func startTask()  {
 	cmd := exec.Command("/bin/sh", TARGETSHELL)
-	bytes, err := cmd.Output()
+	_, err := cmd.Output()
 	if err == nil {
-		fmt.Println(string(bytes))
+		fmt.Println("部署成功")
 	} else {
-		fmt.Println("err", err)
+		fmt.Println("部署失败:", err)
 	}
+}
+
+func verifySignature(signature string, data string) bool {
+	return (signature == generateHashSignature(string(data)))
 }
 
 func main() {
