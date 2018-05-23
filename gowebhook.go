@@ -13,6 +13,10 @@ import (
 	"os/exec"
 )
 
+const (
+	version = 0.1
+)
+
 var (
 	targetSecret = ""
 	targetURL    = ""
@@ -34,11 +38,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 func autoBuild(w http.ResponseWriter, r *http.Request) {
 	if (r.Method == "post" || r.Method == "POST") && r.URL.RequestURI() == targetURL {
-		fmt.Println(r.URL.RequestURI())
 		if r.Header.Get("x-github-event") == "push" {
 			bodyContent, _ := ioutil.ReadAll(r.Body)
 			r.Body.Close()
-
 			signature := r.Header.Get("X-Hub-Signature")
 			if verifySignature(signature, string(bodyContent)) {
 				fmt.Fprintln(w, "{\"code\":200, \"description\":\"OK\"}")
@@ -63,14 +65,14 @@ func loadConfig() {
 		json.Unmarshal(result, &f)
 		m := f.(map[string]interface{})
 		localUrl, ok0 := m["requestUrl"].(string)
-		LocalSecret, ok1 := m["secret"].(string)
-		LocalHost, ok2 := m["host"].(string)
+		localSecret, ok1 := m["secret"].(string)
+		localHost, ok2 := m["host"].(string)
 		localPort, ok3 := m["port"].(string)
 		localShell, ok4 := m["script"].(string)
 		if ok0 && ok1 && ok2 && ok3 && ok4 {
 			targetURL = localUrl
-			targetSecret = LocalSecret
-			targetHost = LocalHost
+			targetSecret = localSecret
+			targetHost = localHost
 			targetPort = localPort
 			targetShell = localShell
 		} else {
