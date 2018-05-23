@@ -14,11 +14,11 @@ import (
 )
 
 var (
-	targetSecret string = ""
-	targetURL    string = ""
-	targetPort   string = ""
-	targetHost   string = ""
-	targetShell  string = ""
+	targetSecret = ""
+	targetURL    = ""
+	targetPort   = ""
+	targetHost   = ""
+	targetShell  = ""
 )
 
 func generateHashSignature(message string) string {
@@ -28,6 +28,7 @@ func generateHashSignature(message string) string {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(string(r.URL.Host))
 	fmt.Fprintln(w, "{\"code\":200, \"description\":\"service running...\"}")
 }
 
