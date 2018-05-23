@@ -1,27 +1,28 @@
 package main
 
 import (
-	"net/http"
-	"fmt"
-	"crypto/sha1"
 	"crypto/hmac"
+	"crypto/sha1"
 	"encoding/hex"
-	"io/ioutil"
-	"os/exec"
 	"encoding/json"
-	"os"
+	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
+	"os/exec"
 )
 
-var TARGETSECRET string = ""
-var TARGETURL string = ""
-var TARGETPORT string = ""
-var TARGETHOST string = ""
-var TARGETSHELL string = ""
-
+var (
+	targetSecret string = ""
+	targetURL    string = ""
+	targetPort   string = ""
+	targetHost   string = ""
+	targetShell  string = ""
+)
 
 func generateHashSignature(message string) string {
-	h := hmac.New(sha1.New, []byte(TARGETSECRET))
+	h := hmac.New(sha1.New, []byte(targetSecret))
 	h.Write([]byte(message))
 	return "sha1=" + hex.EncodeToString(h.Sum(nil))
 }
@@ -30,8 +31,8 @@ func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "{\"code\":200, \"description\":\"service running...\"}")
 }
 
-func autoBuild(w http.ResponseWriter, r *http.Request)  {
-	if (r.Method == "post" || r.Method == "POST") && r.URL.RequestURI() == TARGETURL {
+func autoBuild(w http.ResponseWriter, r *http.Request) {
+	if (r.Method == "post" || r.Method == "POST") && r.URL.RequestURI() == targetURL {
 		fmt.Println(r.URL.RequestURI())
 		if r.Header.Get("x-github-event") == "push" {
 			bodyContent, _ := ioutil.ReadAll(r.Body)
@@ -54,7 +55,7 @@ func autoBuild(w http.ResponseWriter, r *http.Request)  {
 	}
 }
 
-func loadConfig()  {
+func loadConfig() {
 	result, err := ioutil.ReadFile("/etc/gowebhook/config")
 	if err == nil {
 		var f interface{}
@@ -66,11 +67,11 @@ func loadConfig()  {
 		localPort, ok3 := m["port"].(string)
 		localShell, ok4 := m["script"].(string)
 		if ok0 && ok1 && ok2 && ok3 && ok4 {
-			TARGETURL = localUrl
-			TARGETSECRET = LocalSecret
-			TARGETHOST = LocalHost
-			TARGETPORT = localPort
-			TARGETSHELL = localShell
+			targetURL = localUrl
+			targetSecret = LocalSecret
+			targetHost = LocalHost
+			targetPort = localPort
+			targetShell = localShell
 		} else {
 			fmt.Println("Broken config.")
 			os.Exit(0)
@@ -81,19 +82,19 @@ func loadConfig()  {
 	}
 }
 
-func startService()  {
+func startService() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/auto_build", autoBuild)
 
-	fmt.Println("service starting...", TARGETHOST, TARGETPORT)
-	listenErr := http.ListenAndServe(fmt.Sprintf("%s:%s", TARGETHOST, TARGETPORT), nil)
+	fmt.Println("service starting...", targetHost, targetPort)
+	listenErr := http.ListenAndServe(fmt.Sprintf("%s:%s", targetHost, targetPort), nil)
 	if listenErr != nil {
 		log.Fatal("ListenAndServe: ", listenErr)
 	}
 }
 
-func startTask()  {
-	cmd := exec.Command("/bin/sh", TARGETSHELL)
+func startTask() {
+	cmd := exec.Command("/bin/sh", targetShell)
 	_, err := cmd.Output()
 	if err == nil {
 		fmt.Println("部署成功")
@@ -103,7 +104,7 @@ func startTask()  {
 }
 
 func verifySignature(signature string, data string) bool {
-	return (signature == generateHashSignature(string(data)))
+	return signature == generateHashSignature(string(data))
 }
 
 func main() {
