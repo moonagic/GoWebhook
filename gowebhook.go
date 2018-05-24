@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"time"
 )
 
 var (
@@ -157,7 +158,8 @@ func log2file(content string)  {
 
 	f, err := os.OpenFile(targetLogDir + targetLogFile, os.O_APPEND|os.O_WRONLY, 0600)
 	if err == nil {
-		f.WriteString(content)
+		timeString := time.Now().Format("2006-01-02 15:04:05")
+		f.WriteString("[" + timeString + "]" + "" + content)
 		f.WriteString("\n")
 	} else {
 		fmt.Println("Open file faild...", targetLogDir + targetLogFile)
