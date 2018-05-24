@@ -1,5 +1,6 @@
 # GoWebhooks
-一个使用Go编写的Github webhook接收处理服务.
+一个使用Go编写的Github webhook接收处理服务.  
+[用Golang重新写了一个Github webhook后台服务](https://moonagic.com/make-webhook-backend-with-golang/)
 
 ## 配置
 ```
