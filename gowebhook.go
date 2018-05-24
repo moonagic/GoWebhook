@@ -13,16 +13,16 @@ import (
 	"os/exec"
 )
 
-const (
-	version = 0.1
-)
-
 var (
-	targetSecret = ""
-	targetURL    = ""
-	targetPort   = ""
-	targetHost   = ""
-	targetShell  = ""
+	targetSecret     = ""
+	targetURL        = ""
+	targetPort       = ""
+	targetHost       = ""
+	targetShell      = ""
+	targetLogDir     = "/etc/gowebhook/"
+	targetLogFile    = "log"
+	queue []string
+	running          = false
 )
 
 func generateHashSignature(message string) string {
@@ -32,7 +32,7 @@ func generateHashSignature(message string) string {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	log.Println(string(r.URL.Host))
+	log2file(string(r.URL.Host))
 	fmt.Fprintln(w, "{\"code\":200, \"description\":\"service running...\"}")
 }
 
@@ -44,10 +44,11 @@ func autoBuild(w http.ResponseWriter, r *http.Request) {
 			signature := r.Header.Get("X-Hub-Signature")
 			if verifySignature(signature, string(bodyContent)) {
 				fmt.Fprintln(w, "{\"code\":200, \"description\":\"OK\"}")
-				log.Println("验证通过,启动部署任务")
-				go startTask()
+				log2file("验证通过,启动部署任务")
+				queue = append(queue, "1")
+				checkoutTaskStatus()
 			} else {
-				log.Println("验证失败")
+				log2file("验证失败")
 				fmt.Fprintln(w, "{\"code\":200, \"error\":\"Signature error\"}")
 			}
 		} else {
@@ -76,12 +77,23 @@ func loadConfig() {
 			targetPort = localPort
 			targetShell = localShell
 		} else {
-			log.Println("Broken config.")
+			log2file("Broken config.")
 			os.Exit(0)
 		}
 	} else {
-		log.Println("Can not find config file...in \"/etc/gowebhook/config\"")
+		log2file("Can not find config file...in \"/etc/gowebhook/config\"")
 		os.Exit(0)
+	}
+}
+
+func checkoutTaskStatus()  {
+	if running {
+		return
+	}
+	if len(queue) > 0 {
+		data := []string{""}
+		queue = data[:0:0]
+		go startTask()
 	}
 }
 
@@ -89,7 +101,8 @@ func startService() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/auto_build", autoBuild)
 
-	log.Println("service starting...", targetHost, targetPort)
+
+	log2file(fmt.Sprintf("service starting... %s:%s", targetHost, targetPort))
 	listenErr := http.ListenAndServe(fmt.Sprintf("%s:%s", targetHost, targetPort), nil)
 	if listenErr != nil {
 		log.Fatal("ListenAndServe: ", listenErr)
@@ -97,17 +110,57 @@ func startService() {
 }
 
 func startTask() {
+	running = true
 	cmd := exec.Command("/bin/sh", targetShell)
 	_, err := cmd.Output()
 	if err == nil {
-		log.Println("部署成功")
+		running = false
+		log2file("部署成功")
 	} else {
-		log.Println("部署失败:", err)
+		running = false
+		log2file(fmt.Sprintf("部署失败:\n %s", err))
 	}
 }
 
 func verifySignature(signature string, data string) bool {
 	return signature == generateHashSignature(string(data))
+}
+
+func log2file(content string)  {
+	var err error
+
+	if _, err := os.Stat(targetLogDir); err == nil {
+		fmt.Println("Dir exists", targetLogDir)
+	} else {
+		fmt.Println("Dir not exists, try to create...", targetLogDir)
+		err := os.MkdirAll(targetLogDir, 0711)
+		if err != nil {
+			fmt.Println("Error creating directory", targetLogDir)
+			fmt.Println("err:", err)
+			return
+		}
+	}
+
+	if _, err := os.Stat(targetLogFile); err == nil {
+		fmt.Println("Path exists", targetLogFile)
+	} else {
+		fmt.Println("Path not exists, try to create...", targetLogFile)
+		_, err := os.Create(targetLogFile)
+		if err != nil {
+			fmt.Println("Error creating file", targetLogFile)
+			fmt.Println("err:", err)
+			return
+		}
+	}
+
+	f, err := os.OpenFile(targetLogFile, os.O_APPEND|os.O_WRONLY, 0600)
+	if err == nil {
+		f.WriteString(content)
+		f.WriteString("\n")
+	} else {
+		fmt.Println("Open file faild...", targetLogFile)
+		fmt.Println("err:", err)
+	}
 }
 
 func main() {
