@@ -17,3 +17,6 @@
 # compile file
 gowebhook
 
+# log file
+log
+
