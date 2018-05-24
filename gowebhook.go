@@ -32,7 +32,7 @@ func generateHashSignature(message string) string {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(string(r.URL.Host))
+	log.Println(string(r.URL.Host))
 	fmt.Fprintln(w, "{\"code\":200, \"description\":\"service running...\"}")
 }
 
@@ -44,10 +44,10 @@ func autoBuild(w http.ResponseWriter, r *http.Request) {
 			signature := r.Header.Get("X-Hub-Signature")
 			if verifySignature(signature, string(bodyContent)) {
 				fmt.Fprintln(w, "{\"code\":200, \"description\":\"OK\"}")
-				fmt.Println("验证通过,启动部署任务")
+				log.Println("验证通过,启动部署任务")
 				go startTask()
 			} else {
-				fmt.Println("验证失败")
+				log.Println("验证失败")
 				fmt.Fprintln(w, "{\"code\":200, \"error\":\"Signature error\"}")
 			}
 		} else {
@@ -76,11 +76,11 @@ func loadConfig() {
 			targetPort = localPort
 			targetShell = localShell
 		} else {
-			fmt.Println("Broken config.")
+			log.Println("Broken config.")
 			os.Exit(0)
 		}
 	} else {
-		fmt.Println("Can not find config file...in \"/etc/gowebhook/config\"")
+		log.Println("Can not find config file...in \"/etc/gowebhook/config\"")
 		os.Exit(0)
 	}
 }
@@ -89,7 +89,7 @@ func startService() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/auto_build", autoBuild)
 
-	fmt.Println("service starting...", targetHost, targetPort)
+	log.Println("service starting...", targetHost, targetPort)
 	listenErr := http.ListenAndServe(fmt.Sprintf("%s:%s", targetHost, targetPort), nil)
 	if listenErr != nil {
 		log.Fatal("ListenAndServe: ", listenErr)
@@ -100,9 +100,9 @@ func startTask() {
 	cmd := exec.Command("/bin/sh", targetShell)
 	_, err := cmd.Output()
 	if err == nil {
-		fmt.Println("部署成功")
+		log.Println("部署成功")
 	} else {
-		fmt.Println("部署失败:", err)
+		log.Println("部署失败:", err)
 	}
 }
 
