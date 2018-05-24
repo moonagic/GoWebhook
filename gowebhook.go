@@ -116,9 +116,11 @@ func startTask() {
 	if err == nil {
 		running = false
 		log2file("部署成功")
+		checkoutTaskStatus()
 	} else {
 		running = false
 		log2file(fmt.Sprintf("部署失败:\n %s", err))
+		checkoutTaskStatus()
 	}
 }
 
@@ -141,24 +143,24 @@ func log2file(content string)  {
 		}
 	}
 
-	if _, err := os.Stat(targetLogFile); err == nil {
-		fmt.Println("Path exists", targetLogFile)
+	if _, err := os.Stat(targetLogDir + targetLogFile); err == nil {
+		fmt.Println("Path exists", targetLogDir + targetLogFile)
 	} else {
-		fmt.Println("Path not exists, try to create...", targetLogFile)
-		_, err := os.Create(targetLogFile)
+		fmt.Println("Path not exists, try to create...", targetLogDir + targetLogFile)
+		_, err := os.Create(targetLogDir + targetLogFile)
 		if err != nil {
-			fmt.Println("Error creating file", targetLogFile)
+			fmt.Println("Error creating file", targetLogDir + targetLogFile)
 			fmt.Println("err:", err)
 			return
 		}
 	}
 
-	f, err := os.OpenFile(targetLogFile, os.O_APPEND|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(targetLogDir + targetLogFile, os.O_APPEND|os.O_WRONLY, 0600)
 	if err == nil {
 		f.WriteString(content)
 		f.WriteString("\n")
 	} else {
-		fmt.Println("Open file faild...", targetLogFile)
+		fmt.Println("Open file faild...", targetLogDir + targetLogFile)
 		fmt.Println("err:", err)
 	}
 }
