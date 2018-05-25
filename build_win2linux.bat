@@ -1,5 +1,5 @@
 SET CGO_ENABLED=0
 SET GOOS=linux
 SET GOARCH=amd64
-go build gowebhook.go
+go build -o gowebhook src/main.go
 
