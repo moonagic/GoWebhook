@@ -20,3 +20,6 @@ gowebhook
 # log file
 log
 
+# DS_Store
+*.DS_Store
+
