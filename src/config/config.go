@@ -29,12 +29,10 @@ func LoadConfig() string {
 			config["port"] = localPort
 			config["shell"] = localShell
 			return ""
-		} else {
-			return "Broken config."
 		}
-	} else {
-		return "Can not find config file...in \"/etc/gowebhook/config\""
+		return "Broken config."
 	}
+	return "Can not find config file...in \"/etc/gowebhook/config\""
 }
 
 // GetURL ...
