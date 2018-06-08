@@ -23,3 +23,8 @@ log
 # DS_Store
 *.DS_Store
 
+# debug
+*debug
+
+# vscode
+.vscode
