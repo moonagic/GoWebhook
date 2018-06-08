@@ -1,5 +1,6 @@
 # GoWebhooks
 一个使用Go编写的Github webhook接收处理服务.  
+[![Go Report Card](https://goreportcard.com/badge/github.com/moonagic/GoWebhook)](https://goreportcard.com/report/github.com/moonagic/GoWebhook)  
 [用Golang重写Github webhook后台服务](https://moonagic.com/make-webhook-backend-with-golang/)
 
 ## 配置
