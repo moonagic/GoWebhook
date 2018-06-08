@@ -1,15 +1,16 @@
 package utils
 
 import (
-	"os"
 	"fmt"
+	"os"
 	"time"
 )
 
-var targetLogDir     = "/etc/gowebhook/"
-var targetLogFile    = "log"
+var targetLogDir = "/etc/gowebhook/"
+var targetLogFile = "log"
 
-func Log2file(content string)  {
+// Log2file write log to file
+func Log2file(content string) {
 	var err error
 
 	if _, err := os.Stat(targetLogDir); err == nil {
@@ -27,22 +28,22 @@ func Log2file(content string)  {
 	if _, err := os.Stat(targetLogDir + targetLogFile); err == nil {
 
 	} else {
-		fmt.Println("Path not exists, try to create...", targetLogDir + targetLogFile)
+		fmt.Println("Path not exists, try to create...", targetLogDir+targetLogFile)
 		_, err := os.Create(targetLogDir + targetLogFile)
 		if err != nil {
-			fmt.Println("Error creating file", targetLogDir + targetLogFile)
+			fmt.Println("Error creating file", targetLogDir+targetLogFile)
 			fmt.Println("err:", err)
 			return
 		}
 	}
 
-	f, err := os.OpenFile(targetLogDir + targetLogFile, os.O_APPEND|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(targetLogDir+targetLogFile, os.O_APPEND|os.O_WRONLY, 0600)
 	if err == nil {
 		timeString := time.Now().Format("2006-01-02 15:04:05")
 		f.WriteString("[" + timeString + "]" + "" + content)
 		f.WriteString("\n")
 	} else {
-		fmt.Println("Open file faild...", targetLogDir + targetLogFile)
+		fmt.Println("Open file faild...", targetLogDir+targetLogFile)
 		fmt.Println("err:", err)
 	}
 }

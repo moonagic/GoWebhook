@@ -12,6 +12,7 @@ func generateHashSignature(message string, secret string) string {
 	return "sha1=" + hex.EncodeToString(h.Sum(nil))
 }
 
+// VerifySignature verify sign
 func VerifySignature(signature string, data string, secret string) bool {
 	return signature == generateHashSignature(string(data), secret)
 }

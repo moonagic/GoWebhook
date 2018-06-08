@@ -1,9 +1,9 @@
 package main
 
 import (
-	"GoWebhooks/src/utils"
 	"GoWebhooks/src/config"
 	"GoWebhooks/src/server"
+	"GoWebhooks/src/utils"
 	"log"
 	"os"
 )
@@ -21,4 +21,3 @@ func main() {
 	}
 
 }
-

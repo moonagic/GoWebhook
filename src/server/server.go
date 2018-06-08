@@ -1,14 +1,15 @@
 package server
 
 import (
-	"net/http"
-	"fmt"
-	"GoWebhooks/src/utils"
-	"io/ioutil"
-	"GoWebhooks/src/task"
 	"GoWebhooks/src/config"
+	"GoWebhooks/src/task"
+	"GoWebhooks/src/utils"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
+// StartService start service
 func StartService(address string, port string) error {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/auto_build", autoBuild)

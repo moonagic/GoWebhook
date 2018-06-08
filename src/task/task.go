@@ -1,10 +1,10 @@
 package task
 
 import (
-	"os/exec"
+	"GoWebhooks/src/config"
 	"GoWebhooks/src/utils"
 	"fmt"
-	"GoWebhooks/src/config"
+	"os/exec"
 )
 
 var running = false
@@ -14,15 +14,17 @@ type structTaskQueue struct {
 	requestBodyString string
 }
 
-func AddNewTask(bodyContent string)  {
-	queue = append(queue, NewStructTaskQueue(bodyContent))
+// AddNewTask add new task
+func AddNewTask(bodyContent string) {
+	queue = append(queue, newStructTaskQueue(bodyContent))
 }
 
-func NewStructTaskQueue(body string) *structTaskQueue {
+func newStructTaskQueue(body string) *structTaskQueue {
 	return &structTaskQueue{body}
 }
 
-func CheckoutTaskStatus()  {
+// CheckoutTaskStatus checkout task status
+func CheckoutTaskStatus() {
 	if running {
 		return
 	}
