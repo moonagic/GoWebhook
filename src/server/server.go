@@ -33,7 +33,6 @@ func autoBuild(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, "{\"code\":200, \"description\":\"OK\"}")
 				utils.Log2file("验证通过,启动部署任务")
 				task.AddNewTask(string(bodyContent))
-				task.CheckoutTaskStatus()
 			} else {
 				utils.Log2file("验证失败")
 				fmt.Fprintln(w, "{\"code\":200, \"error\":\"Signature error\"}")

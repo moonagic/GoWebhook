@@ -17,14 +17,14 @@ type structTaskQueue struct {
 // AddNewTask add new task
 func AddNewTask(bodyContent string) {
 	queue = append(queue, newStructTaskQueue(bodyContent))
+	checkoutTaskStatus()
 }
 
 func newStructTaskQueue(body string) *structTaskQueue {
 	return &structTaskQueue{body}
 }
 
-// CheckoutTaskStatus checkout task status
-func CheckoutTaskStatus() {
+func checkoutTaskStatus() {
 	if running {
 		return
 	}
@@ -41,10 +41,10 @@ func startTask() {
 	if err == nil {
 		running = false
 		utils.Log2file("部署成功")
-		CheckoutTaskStatus()
+		checkoutTaskStatus()
 	} else {
 		running = false
 		utils.Log2file(fmt.Sprintf("部署失败:\n %s", err))
-		CheckoutTaskStatus()
+		checkoutTaskStatus()
 	}
 }
