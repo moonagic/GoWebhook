@@ -1,9 +1,9 @@
 package server
 
 import (
-	"GoWebhooks/src/config"
-	"GoWebhooks/src/task"
-	"GoWebhooks/src/utils"
+	"GoWebhook/src/config"
+	"GoWebhook/src/task"
+	"GoWebhook/src/utils"
 	"fmt"
 	"io/ioutil"
 	"net/http"

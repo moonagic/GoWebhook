@@ -1,9 +1,9 @@
 package main
 
 import (
-	"GoWebhooks/src/config"
-	"GoWebhooks/src/server"
-	"GoWebhooks/src/utils"
+	"GoWebhook/src/config"
+	"GoWebhook/src/server"
+	"GoWebhook/src/utils"
 	"log"
 	"os"
 )

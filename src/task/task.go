@@ -1,8 +1,8 @@
 package task
 
 import (
-	"GoWebhooks/src/config"
-	"GoWebhooks/src/utils"
+	"GoWebhook/src/config"
+	"GoWebhook/src/utils"
 	"fmt"
 	"os/exec"
 )
