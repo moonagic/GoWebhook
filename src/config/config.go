@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
+	"runtime"
 )
 
 var (
@@ -11,7 +12,17 @@ var (
 
 // LoadConfig load the config
 func LoadConfig() string {
-	result, err := ioutil.ReadFile("/etc/gowebhook/config")
+	configPath := ""
+	switch runtime.GOOS {
+	case "darwin":
+		configPath = "~/Desktop/config"
+		break
+	case "linux":
+		configPath = "/etc/gowebhook/config"
+		break
+
+	}
+	result, err := ioutil.ReadFile(configPath)
 	if err == nil {
 		var f interface{}
 		json.Unmarshal(result, &f)

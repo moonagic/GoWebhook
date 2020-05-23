@@ -3,14 +3,26 @@ package utils
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 )
 
-var targetLogDir = "/etc/gowebhook/"
 var targetLogFile = "log"
 
 // Log2file write log to file
 func Log2file(content string) {
+
+	targetLogDir := ""
+
+	switch runtime.GOOS {
+	case "linux":
+		targetLogDir = "/etc/gowebhook/"
+		break
+	case "darwin":
+		targetLogDir = "~/Desktop/gowebhook/"
+		break
+	}
+
 	var err error
 
 	if _, err := os.Stat(targetLogDir); err == nil {
