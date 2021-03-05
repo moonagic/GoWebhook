@@ -14,5 +14,5 @@ func generateHashSignature(message string, secret string) string {
 
 // VerifySignature verify sign
 func VerifySignature(signature string, data string, secret string) bool {
-	return signature == generateHashSignature(string(data), secret)
+	return signature == generateHashSignature(data, secret)
 }
