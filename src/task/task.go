@@ -1,7 +1,6 @@
 package task
 
 import (
-	"GoWebhook/src/config"
 	"GoWebhook/src/utils"
 	"fmt"
 	"os/exec"
@@ -11,7 +10,7 @@ var running = false
 var queue []*structTaskQueue
 
 type structTaskQueue struct {
-	requestBodyString string
+	script string
 }
 
 // AddNewTask add new task
@@ -29,14 +28,15 @@ func checkoutTaskStatus() {
 		return
 	}
 	if len(queue) > 0 {
+		script := queue[0].script
 		queue = queue[:0:0]
-		go startTask()
+		go startTask(script)
 	}
 }
 
-func startTask() {
+func startTask(script string) {
 	running = true
-	cmd := exec.Command("/bin/sh", config.GetShell())
+	cmd := exec.Command("/bin/sh", script)
 	_, err := cmd.Output()
 	if err == nil {
 		running = false

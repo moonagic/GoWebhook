@@ -1,0 +1,9 @@
+host: 127.0.0.1
+port: 6606
+servers:
+  - secret: oHryZnDM8gXHfpqj
+    script: /etc/gowebhook/auto_build.sh
+    requestUrl: /auto_build
+  - secret: oHryZnDM8gXHfpqj
+    script: /etc/gowebhook/auto_build.sh
+    requestUrl: /auto_build

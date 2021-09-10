@@ -10,15 +10,15 @@ var (
 	config map[string]string
 )
 
-// LoadConfig load the config
+// LoadConfig load the config.yml
 func LoadConfig() string {
 	configPath := ""
 	switch runtime.GOOS {
 	case "darwin":
-		configPath = "~/Desktop/config"
+		configPath = "config.yml"
 		break
 	case "linux":
-		configPath = "/etc/gowebhook/config"
+		configPath = "/etc/gowebhook/config.yml"
 		break
 
 	}
@@ -43,9 +43,9 @@ func LoadConfig() string {
 				return ""
 			}
 		}
-		return "Broken config."
+		return "Broken config.yml."
 	}
-	return "Can not find config file...in \"/etc/gowebhook/config\""
+	return "Can not find config.yml file...in: " + configPath
 }
 
 // GetURL ...

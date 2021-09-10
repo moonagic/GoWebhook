@@ -19,7 +19,7 @@ func Log2file(content string) {
 		targetLogDir = "/etc/gowebhook/"
 		break
 	case "darwin":
-		targetLogDir = "~/Desktop/gowebhook/"
+		targetLogDir = "dev/"
 		break
 	}
 
