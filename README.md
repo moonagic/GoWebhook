@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/moonagic/GoWebhook)](https://goreportcard.com/report/github.com/moonagic/GoWebhook)  
 [用Golang重写Github webhook后台服务](https://moonagic.com/make-webhook-backend-with-golang/)
 
-## 配置
+## 配置范例
 ```yml
 # vi /etc/gowebhook/config.yml
 host: 127.0.0.1
