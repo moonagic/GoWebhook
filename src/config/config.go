@@ -15,7 +15,7 @@ func LoadConfig2() {
 	configPath := ""
 	switch runtime.GOOS {
 	case "darwin":
-		configPath = "config.yml"
+		configPath = "config.example.yml"
 		break
 	case "linux":
 		configPath = "/etc/gowebhook/config.yml"
