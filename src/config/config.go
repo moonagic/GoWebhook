@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/fatih/color"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"runtime"
+
+	"github.com/fatih/color"
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -59,15 +60,15 @@ func contains(array []string, target string) bool {
 }
 
 type Config struct {
-	Host       string `yaml:"host"`
-	Port       string `yaml:"port"`
-	Servers    []Server `yaml:"servers,flow"`
+	Host    string   `yaml:"host"`
+	Port    string   `yaml:"port"`
+	Servers []Server `yaml:"servers,flow"`
 }
 
 type Server struct {
 	Identifier string `yaml:"identifier"`
 	RequestUrl string `yaml:"requestUrl"`
-	Secret string `yaml:"secret"`
-	Script string `yaml:"script"`
-	UUID string
+	Secret     string `yaml:"secret"`
+	Script     string `yaml:"script"`
+	UUID       string
 }

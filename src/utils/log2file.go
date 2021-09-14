@@ -17,10 +17,8 @@ func Log2file(content string) {
 	switch runtime.GOOS {
 	case "linux":
 		targetLogDir = "/etc/gowebhook/"
-		break
 	case "darwin":
 		targetLogDir = "dev/"
-		break
 	}
 
 	var err error

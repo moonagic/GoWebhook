@@ -7,6 +7,7 @@ import (
 )
 
 var running = false
+
 //var queue []*structTaskQueue
 
 var queue = make(map[string][]*structTaskQueue)
