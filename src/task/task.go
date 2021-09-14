@@ -7,44 +7,51 @@ import (
 )
 
 var running = false
-var queue []*structTaskQueue
+//var queue []*structTaskQueue
+
+var queue = make(map[string][]*structTaskQueue)
 
 type structTaskQueue struct {
 	script string
 }
 
 // AddNewTask add new task
-func AddNewTask(bodyContent string) {
-	queue = append(queue, newStructTaskQueue(bodyContent))
-	checkoutTaskStatus()
+func AddNewTask(identifier string, script string) {
+
+	if _, ok := queue[identifier]; ok {
+		queue[identifier] = append(queue[identifier], newStructTaskQueue(script))
+	} else {
+		queue[identifier] = []*structTaskQueue{newStructTaskQueue(script)}
+	}
+	checkoutTaskStatus(identifier)
 }
 
 func newStructTaskQueue(body string) *structTaskQueue {
 	return &structTaskQueue{body}
 }
 
-func checkoutTaskStatus() {
+func checkoutTaskStatus(identifier string) {
 	if running {
 		return
 	}
-	if len(queue) > 0 {
-		script := queue[0].script
-		queue = queue[:0:0]
-		go startTask(script)
+	if len(queue[identifier]) > 0 {
+		script := queue[identifier][0].script
+		queue[identifier] = queue[identifier][:0:0]
+		go startTask(identifier, script)
 	}
 }
 
-func startTask(script string) {
+func startTask(identifier string, script string) {
 	running = true
 	cmd := exec.Command("/bin/sh", script)
 	_, err := cmd.Output()
 	if err == nil {
 		running = false
 		utils.Log2file("部署成功")
-		checkoutTaskStatus()
+		checkoutTaskStatus(identifier)
 	} else {
 		running = false
 		utils.Log2file(fmt.Sprintf("部署失败:\n %s", err))
-		checkoutTaskStatus()
+		checkoutTaskStatus(identifier)
 	}
 }

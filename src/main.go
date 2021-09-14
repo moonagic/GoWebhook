@@ -3,22 +3,17 @@ package main
 import (
 	"GoWebhook/src/config"
 	"GoWebhook/src/server"
-	"log"
+	"github.com/fatih/color"
 )
 
 func main() {
 
 	config.LoadConfig2()
-	//if errorString := config.LoadConfig(); errorString != "" {
-	//	utils.Log2file(errorString)
-	//	os.Exit(1)
-	//}
-	//
+
+	color.Green("Service starting in %s:%s", config.Instance.Host, config.Instance.Port)
 	listenErr := server.StartService(config.Instance.Host, config.Instance.Port)
 	if listenErr != nil {
-		log.Fatal("ListenAndServer error: ", listenErr)
-	} else {
-		println("ListenAndServer")
+		color.Red("ListenAndServer error: ", listenErr)
 	}
 
 }

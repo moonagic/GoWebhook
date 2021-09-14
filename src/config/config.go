@@ -1,17 +1,17 @@
 package config
 
 import (
-	"encoding/json"
+	"github.com/fatih/color"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"runtime"
 )
 
 var (
-	config map[string]string
+	Instance Config
 )
 
-// LoadConfig load the config.yml
-func LoadConfig() string {
+func LoadConfig2() {
 	configPath := ""
 	switch runtime.GOOS {
 	case "darwin":
@@ -24,51 +24,50 @@ func LoadConfig() string {
 	}
 	result, err := ioutil.ReadFile(configPath)
 	if err == nil {
-		var f interface{}
-		err := json.Unmarshal(result, &f)
-		if err == nil {
-			m := f.(map[string]interface{})
-			localURL, ok0 := m["requestUrl"].(string)
-			localSecret, ok1 := m["secret"].(string)
-			localHost, ok2 := m["host"].(string)
-			localPort, ok3 := m["port"].(string)
-			localShell, ok4 := m["script"].(string)
-			if ok0 && ok1 && ok2 && ok3 && ok4 {
-				config = make(map[string]string)
-				config["url"] = localURL
-				config["secret"] = localSecret
-				config["host"] = localHost
-				config["port"] = localPort
-				config["shell"] = localShell
-				return ""
+		Instance = Config{}
+		err := yaml.Unmarshal(result, &Instance)
+		if err != nil {
+			color.Red("error: %v", err)
+		}
+
+		identifiers := make([]string, 0)
+		secrets := make([]string, 0)
+		for _, server := range Instance.Servers {
+			if !contains(identifiers, server.Identifier) {
+				identifiers = append(identifiers, server.Identifier)
+			} else {
+				color.Red("Identifiers in config have to different")
+			}
+			if !contains(secrets, server.Secret) {
+				secrets = append(secrets, server.Secret)
+			} else {
+				color.Red("Secrets in config have to different")
 			}
 		}
-		return "Broken config.yml."
+	} else {
+		color.Red("error: %v", err)
 	}
-	return "Can not find config.yml file...in: " + configPath
 }
 
-// GetURL ...
-func GetURL() string {
-	return config["url"]
+func contains(array []string, target string) bool {
+	for _, value := range array {
+		if value == target {
+			return true
+		}
+	}
+	return false
 }
 
-// GetSecret ...
-func GetSecret() string {
-	return config["secret"]
+type Config struct {
+	Host       string `yaml:"host"`
+	Port       string `yaml:"port"`
+	Servers    []Server `yaml:"servers,flow"`
 }
 
-// GetHost ...
-func GetHost() string {
-	return config["host"]
-}
-
-// GetPort ...
-func GetPort() string {
-	return config["port"]
-}
-
-// GetShell ...
-func GetShell() string {
-	return config["shell"]
+type Server struct {
+	Identifier string `yaml:"identifier"`
+	RequestUrl string `yaml:"requestUrl"`
+	Secret string `yaml:"secret"`
+	Script string `yaml:"script"`
+	UUID string
 }

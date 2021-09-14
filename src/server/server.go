@@ -64,7 +64,7 @@ func autoBuild(w http.ResponseWriter, r *http.Request) {
 			if utils.VerifySignature(signature, string(bodyContent), server.Secret) {
 				_, _ = fmt.Fprintln(w, "{\"code\":200, \"description\":\"OK\"}")
 				utils.Log2file("验证通过,启动部署任务")
-				task.AddNewTask(server.Script)
+				task.AddNewTask(server.Identifier, server.Script)
 				break
 			} else {
 				utils.Log2file("验证失败")
