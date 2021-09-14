@@ -5,14 +5,19 @@
 
 ## 配置
 ```
-# vi /etc/gowebhook/config
-{
-  "requestUrl": "在Webhooks中设定的Payload URL",
-  "secret": "在Webhooks中设定的secret",
-  "host": "监听地址",
-  "port": "监听端口",
-  "script": "用于部署的shell脚本"
-}
+# vi /etc/gowebhook/config.yml
+host: 127.0.0.1
+port: 6606
+
+servers:
+  - identifier: dsijubhdfgbgfdnghf2
+    secret: oHryZnDM8gXHfpqj
+    script: /etc/gowebhook/auto_build.sh
+    requestUrl: /auto_build
+  - identifier: dsijubhdfgbgfdnghf
+    secret: oHryZnDM8gXHfpqj1
+    script: /etc/gowebhook/auto_build.sh
+    requestUrl: /auto_build
 ```
 
 ## 简单的systemd启动服务
