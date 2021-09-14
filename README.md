@@ -4,7 +4,7 @@
 [用Golang重写Github webhook后台服务](https://moonagic.com/make-webhook-backend-with-golang/)
 
 ## 配置
-```
+```yml
 # vi /etc/gowebhook/config.yml
 host: 127.0.0.1
 port: 6606
