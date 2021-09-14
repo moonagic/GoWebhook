@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	config.LoadConfig2()
+	config.LoadConfig()
 
 	color.Green("Service starting in %s:%s", config.Instance.Host, config.Instance.Port)
 	listenErr := server.StartService(config.Instance.Host, config.Instance.Port)

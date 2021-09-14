@@ -11,7 +11,7 @@ var (
 	Instance Config
 )
 
-func LoadConfig2() {
+func LoadConfig() {
 	configPath := ""
 	switch runtime.GOOS {
 	case "darwin":
