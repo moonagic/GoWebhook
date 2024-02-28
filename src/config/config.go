@@ -1,7 +1,7 @@
 package config
 
 import (
-	"io/ioutil"
+	"os"
 	"runtime"
 
 	"github.com/fatih/color"
@@ -23,7 +23,7 @@ func LoadConfig() {
 		break
 
 	}
-	result, err := ioutil.ReadFile(configPath)
+	result, err := os.ReadFile(configPath)
 	if err == nil {
 		Instance = Config{}
 		err := yaml.Unmarshal(result, &Instance)

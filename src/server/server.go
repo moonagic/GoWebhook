@@ -5,7 +5,7 @@ import (
 	"GoWebhook/src/task"
 	"GoWebhook/src/utils"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -58,7 +58,7 @@ func autoBuild(w http.ResponseWriter, r *http.Request) {
 	matchCount := 0
 	for _, server := range servers {
 		if r.Header.Get("x-github-event") == "push" {
-			bodyContent, _ := ioutil.ReadAll(r.Body)
+			bodyContent, _ := io.ReadAll(r.Body)
 			_ = r.Body.Close()
 			signature := r.Header.Get("X-Hub-Signature")
 			if utils.VerifySignature(signature, string(bodyContent), server.Secret) {
